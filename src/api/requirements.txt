@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pymongo
+google-generativeai
+PyMuPDF
+nest_asyncio
+python-dotenv
+python-multipart
