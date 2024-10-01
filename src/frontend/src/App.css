@@ -180,7 +180,6 @@ hr {
   }
 }
 
-/* Animação para as Mensagens */
 .chat-entry {
   transition: transform 0.3s ease, opacity 0.3s ease;
   opacity: 0;
@@ -197,4 +196,34 @@ hr {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+  align-items: center;
+}
+
+
+.icon-button {
+  cursor: pointer;
+  color: #0999a7;
+  transition: color 0.3s ease, transform 0.2s ease;
+  font-size: 1.2rem;
+}
+
+
+.icon-button:hover {
+  color: #07c3db; 
+  transform: scale(1.2);
+}
+
+
+.copy-text {
+  color: #0999a7;
+}
+
+.copy-text:hover {
+  color: #07c3db;
 }

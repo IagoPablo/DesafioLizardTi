@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
-import { FaRobot } from 'react-icons/fa';
+import { FaRobot, FaCopy, FaDownload, FaRegCopy } from 'react-icons/fa'; 
 
 function App() {
   const [pdf, setPdf] = useState(null);
@@ -13,10 +13,9 @@ function App() {
   
   const chatEndRef = useRef(null);
 
-  // URL do backend hospedado (ajuste após o deploy)
-  const BACKEND_URL = 'http://localhost:8000'; // Durante o desenvolvimento local
+  const BACKEND_URL = 'http://localhost:8000';
 
-  // Função para rolar o chat para a última mensagem
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -65,7 +64,7 @@ function App() {
       alert('Por favor, faça upload de um PDF primeiro.');
       return;
     }
-
+      
     setLoading(true);
 
     try {
@@ -73,16 +72,16 @@ function App() {
         pdf_id: pdfId,
         question: question,
       });
-      console.log(res.data); // Verifique a resposta completa no console
-      // Adiciona a pergunta do usuário
+      console.log(res.data);
       setChatHistory([...chatHistory, { 
         type: 'user', 
         message: question 
       }, { 
         type: 'ai', 
         resposta: res.data.resposta, 
-        explicação: res.data.explicação 
-      }]); // Adiciona a resposta da IA
+        explicação: res.data.explicação,
+        json: res.data
+      }]);
       setQuestion('');
     } catch (error) {
       console.error(error);
@@ -90,6 +89,40 @@ function App() {
     }
 
     setLoading(false);
+  };
+
+  const handleCopyJSON = (jsonData) => {
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    navigator.clipboard.writeText(jsonString)
+      .then(() => {
+        alert('Resposta JSON copiada para a área de transferência!');
+      })
+      .catch((err) => {
+        console.error('Erro ao copiar:', err);
+        alert('Erro ao copiar a resposta JSON.');
+      });
+  };
+
+  const handleDownloadJSON = (jsonData) => {
+    const jsonString = JSON.stringify(jsonData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `resposta_${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyText = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        alert('Texto copiado para a área de transferência!');
+      })
+      .catch((err) => {
+        console.error('Erro ao copiar:', err);
+        alert('Erro ao copiar o texto.');
+      });
   };
 
   return (
@@ -111,6 +144,23 @@ function App() {
                 <div key={index} className="chat-entry ai-message">
                   <p><strong>Resposta:</strong> {chat.resposta}</p>
                   <p><strong>Explicação:</strong> {chat.explicação}</p>
+                  <div className="action-buttons"> {}
+                    <FaRegCopy 
+                      className="icon-button copy-text" 
+                      title="Copiar Texto" 
+                      onClick={() => handleCopyText(chat.resposta)} 
+                    />
+                    <FaCopy 
+                      className="icon-button" 
+                      title="Copiar JSON" 
+                      onClick={() => handleCopyJSON(chat.json)} 
+                    />
+                    <FaDownload 
+                      className="icon-button" 
+                      title="Baixar JSON" 
+                      onClick={() => handleDownloadJSON(chat.json)} 
+                    />
+                  </div>
                 </div>
               )
             ))}
